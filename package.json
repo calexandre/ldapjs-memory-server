@@ -4,6 +4,7 @@
   "description": "ldapjs in-memory server implementation (from the example at ldapjs.org)",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "build": "npm install && typings install",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

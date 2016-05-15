@@ -6,7 +6,7 @@ var ldap = require('ldapjs');
 function authorize(req, res, next) {
   /* Any user may search after bind, only cn=root has full power */
   var isSearch = (req instanceof ldap.SearchRequest);
-  if (!req.connection.ldap.bindDN.equals('cn=root') && !isSearch)
+  if (!req.connection.ldap.bindDN.equals(basedn) && !isSearch)
     return next(new ldap.InsufficientAccessRightsError());
 
   return next();
@@ -15,32 +15,38 @@ function authorize(req, res, next) {
 
 ///--- Globals
 
-var SUFFIX = 'o=joyent';
+var basedn = "dc=example, dc=com";
+var company = "Example";
+var port = 1389;
 var db = {};
 var server = ldap.createServer();
 
+// Setup the DB
 
+db[`cn=John Doe, ${basedn}`] = {
+  sAMAccountName: "jdoe",
+  userpassword: "demo",
+  objectclass: [ "top", "person", "organizationalPerson", "user" ],
+  cn: "John",
+  mail: "johndoe@gmail.com",
+  givenname: "John",
+  sn: "Doe",
+  ou: company
+}
 
-server.bind('cn=root', function(req, res, next) {
-  if (req.dn.toString() !== 'cn=root' || req.credentials !== 'secret')
-    return next(new ldap.InvalidCredentialsError());
+db[`cn=Test User, ${basedn}`] = {
+  sAMAccountName: "test",
+  userpassword: "test",
+  objectclass: [ "top", "person", "organizationalPerson", "user" ],
+  cn: "test",
+  mail: "test@gmail.com",
+  givenname: "Test",
+  sn: "User",
+  ou: company
+}
 
-  res.end();
-  return next();
-});
-
-server.add(SUFFIX, authorize, function(req, res, next) {
-  var dn = req.dn.toString();
-
-  if (db[dn])
-    return next(new ldap.EntryAlreadyExistsError(dn));
-
-  db[dn] = req.toObject().attributes;
-  res.end();
-  return next();
-});
-
-server.bind(SUFFIX, function(req, res, next) {
+// Test command: ldapsearch -H ldap://localhost:1389 -x -D "cn=John Doe,dc=example,dc=com" -w demo "dc=example,dc=com" objectclass=*
+server.bind(basedn, function(req, res, next) {
   var dn = req.dn.toString();
   if (!db[dn])
     return next(new ldap.NoSuchObjectError(dn));
@@ -55,89 +61,7 @@ server.bind(SUFFIX, function(req, res, next) {
   return next();
 });
 
-server.compare(SUFFIX, authorize, function(req, res, next) {
-  var dn = req.dn.toString();
-  if (!db[dn])
-    return next(new ldap.NoSuchObjectError(dn));
-
-  if (!db[dn][req.attribute])
-    return next(new ldap.NoSuchAttributeError(req.attribute));
-
-  var matches = false;
-  var vals = db[dn][req.attribute];
-  for (var i = 0; i < vals.length; i++) {
-    if (vals[i] === req.value) {
-      matches = true;
-      break;
-    }
-  }
-
-  res.end(matches);
-  return next();
-});
-
-server.del(SUFFIX, authorize, function(req, res, next) {
-  var dn = req.dn.toString();
-  if (!db[dn])
-    return next(new ldap.NoSuchObjectError(dn));
-
-  delete db[dn];
-
-  res.end();
-  return next();
-});
-
-server.modify(SUFFIX, authorize, function(req, res, next) {
-  var dn = req.dn.toString();
-  if (!req.changes.length)
-    return next(new ldap.ProtocolError('changes required'));
-  if (!db[dn])
-    return next(new ldap.NoSuchObjectError(dn));
-
-  var entry = db[dn];
-
-  for (var i = 0; i < req.changes.length; i++) {
-    mod = req.changes[i].modification;
-    switch (req.changes[i].operation) {
-    case 'replace':
-      if (!entry[mod.type])
-        return next(new ldap.NoSuchAttributeError(mod.type));
-
-      if (!mod.vals || !mod.vals.length) {
-        delete entry[mod.type];
-      } else {
-        entry[mod.type] = mod.vals;
-      }
-
-      break;
-
-    case 'add':
-      if (!entry[mod.type]) {
-        entry[mod.type] = mod.vals;
-      } else {
-        mod.vals.forEach(function(v) {
-          if (entry[mod.type].indexOf(v) === -1)
-            entry[mod.type].push(v);
-        });
-      }
-
-      break;
-
-    case 'delete':
-      if (!entry[mod.type])
-        return next(new ldap.NoSuchAttributeError(mod.type));
-
-      delete entry[mod.type];
-
-      break;
-    }
-  }
-
-  res.end();
-  return next();
-});
-
-server.search(SUFFIX, authorize, function(req, res, next) {
+server.search(basedn, function(req, res, next) {
   var dn = req.dn.toString();
   if (!db[dn])
     return next(new ldap.NoSuchObjectError(dn));
@@ -194,6 +118,6 @@ server.search(SUFFIX, authorize, function(req, res, next) {
 
 ///--- Fire it up
 
-server.listen(1389, function() {
+server.listen(port, function() {
   console.log('LDAP server up at: %s', server.url);
 });
