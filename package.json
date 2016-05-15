@@ -1,0 +1,23 @@
+{
+  "name": "ldapjs-memory-server",
+  "version": "1.0.0",
+  "description": "ldapjs in-memory server implementation (from the example at ldapjs.org)",
+  "main": "index.js",
+  "scripts": {
+    "build": "npm install && typings install",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/calexandre/ldapjs-memory-server.git"
+  },
+  "author": "Carlos Alexandre <clpalexandre@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/calexandre/ldapjs-memory-server/issues"
+  },
+  "homepage": "https://github.com/calexandre/ldapjs-memory-server#readme",
+  "dependencies": {
+    "ldapjs": "^1.0.0"
+  }
+}

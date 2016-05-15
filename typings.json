@@ -1,0 +1,6 @@
+{
+  "name": "ldapjs-memory-server",
+  "ambientDependencies": {
+    "node": "registry:dt/node#4.0.0+20160509154515"
+  }
+}
