@@ -1,0 +1,26 @@
+coverage.html
+*.seed
+*.log
+*.csv
+*.dat
+*.out
+*.pid
+*.gz
+dump.rdb
+.DS_Store
+.temp
+
+pids
+logs
+results
+
+node_modules
+npm-debug.log
+.dist
+.tmp/
+typings
+
+
+# dockerignore - content above this line is automatically generated and modifications may be omitted
+# see npmjs.com/dockerignore for more details.
+.gitignore
