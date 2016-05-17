@@ -17,7 +17,7 @@
 				"NODE_ENV": "development",
 				"DEBUG": "*"
 			},
-			"externalConsole": false
+			"externalConsole": true
 		},
 		{
 			"name": "Attach",

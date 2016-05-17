@@ -16,19 +16,6 @@ results
 
 node_modules
 npm-debug.log
-public/dist/
 .dist
-config/config.js
-backup/*.json
-backup/*.gz
-docs/web/history.md
-docs/web/_readme.md
-view/web/_layout.html
-bin/mysql.js
-bin/test.sql
-coverage/
-config/web_readme.md
 .tmp/
-*.sqlite
-.cnpmjs.org
 typings

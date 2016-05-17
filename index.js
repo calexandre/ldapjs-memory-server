@@ -15,9 +15,9 @@ function authorize(req, res, next) {
 
 ///--- Globals
 
-var basedn = "dc=example, dc=com";
+var basedn = process.env.LDAP_BASEDN || "dc=example, dc=com";
 var company = "Example";
-var port = 1389;
+var port = process.env.LDAP_PORT || 1389;
 var db = {};
 var server = ldap.createServer();
 
@@ -119,5 +119,7 @@ server.search(basedn, function(req, res, next) {
 ///--- Fire it up
 
 server.listen(port, function() {
+  console.log("Using the following db:")
+  console.log(JSON.stringify(db, null, 2));
   console.log('LDAP server up at: %s', server.url);
 });
