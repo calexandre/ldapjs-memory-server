@@ -1,0 +1,41 @@
+{
+    "baseDN": "dc=example, dc=com",
+    "cn=John Doe, dc=example, dc=com": {
+        "sAMAccountName": "jdoe",
+        "userpassword": "demo",
+        "objectclass": [ "top", "person", "organizationalPerson", "user" ],
+        "memberOf": [
+            "CN=Domain Admins,CN=Users,DC=example,DC=com",
+            "CN=editors,OU=DevPortalEditors,DC=example,DC=com"
+        ],
+        "cn": "John Doe",
+        "mail": "johndoe@gmail.com",
+        "givenname": "John",
+        "sn": "Doe"
+    },
+    "cn=Test User, dc=example, dc=com": {
+        "sAMAccountName": "tuser",
+        "userpassword": "test",
+        "objectclass": [ "top", "person", "organizationalPerson", "user" ],
+        "memberOf": [
+            "CN=editors,OU=DevPortalEditors,DC=example,DC=com"
+        ],
+        "cn": "Test User",
+        "mail": "testuser@gmail.com",
+        "givenname": "Test",
+        "sn": "USer"
+    },
+    "cn=Locked User, dc=example, dc=com": {
+        "sAMAccountName": "locked",
+        "userpassword": "locked",
+        "objectclass": [ "top", "person", "organizationalPerson", "user" ],
+        "memberOf": [
+            "CN=editors,OU=DevPortalEditors,DC=example,DC=com"
+        ],
+        "cn": "Locked User",
+        "mail": "lockeduser@gmail.com",
+        "givenname": "Locked",
+        "sn": "User",
+        "lockoutTime": 1
+    }
+}
