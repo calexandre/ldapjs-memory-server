@@ -7,7 +7,8 @@
     "start": "node index.js",
     "build": "npm install && typings install",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "docker:build": "docker build -t calexandre/ldapjs-memory-server ."
+    "docker:build": "docker build -t calexandre/ldapjs-memory-server .",
+    "docker:run": "docker run --name ldapjs-memory-server -p 1389:1389 -d calexandre/ldapjs-memory-server && docker ps"
   },
   "repository": {
     "type": "git",

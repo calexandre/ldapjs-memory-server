@@ -13,6 +13,9 @@ COPY . $appRoot
 # Install app dependencies
 RUN npm install
 
+# Expose the db
+VOLUME $appRoot
+
 # Registry and Website
 EXPOSE 1389
 

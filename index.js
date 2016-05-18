@@ -1,52 +1,16 @@
 var ldap = require('ldapjs');
+var fs = require('fs');
+var path = require('path');
 
 
-///--- Shared handlers
-
-function authorize(req, res, next) {
-  /* Any user may search after bind, only cn=root has full power */
-  var isSearch = (req instanceof ldap.SearchRequest);
-  if (!req.connection.ldap.bindDN.equals(basedn) && !isSearch)
-    return next(new ldap.InsufficientAccessRightsError());
-
-  return next();
-}
-
-
-///--- Globals
-
-var basedn = process.env.LDAP_BASEDN || "dc=example, dc=com";
-var company = "Example";
+var dbPath = process.env.LDAP_DB_JSON || path.join(__dirname, "db.json")
+var db = require(dbPath);
+var baseDN = process.env.LDAP_BASEDN || db.baseDN || "dc=example, dc=com";
 var port = process.env.LDAP_PORT || 1389;
-var db = {};
+
 var server = ldap.createServer();
 
-// Setup the DB
-
-db[`cn=John Doe, ${basedn}`] = {
-  sAMAccountName: "jdoe",
-  userpassword: "demo",
-  objectclass: [ "top", "person", "organizationalPerson", "user" ],
-  cn: "John",
-  mail: "johndoe@gmail.com",
-  givenname: "John",
-  sn: "Doe",
-  ou: company
-}
-
-db[`cn=Test User, ${basedn}`] = {
-  sAMAccountName: "test",
-  userpassword: "test",
-  objectclass: [ "top", "person", "organizationalPerson", "user" ],
-  cn: "test",
-  mail: "test@gmail.com",
-  givenname: "Test",
-  sn: "User",
-  ou: company
-}
-
-// Test command: ldapsearch -H ldap://localhost:1389 -x -D "cn=John Doe,dc=example,dc=com" -w demo "dc=example,dc=com" objectclass=*
-server.bind(basedn, function(req, res, next) {
+server.bind(baseDN, function(req, res, next) {
   var dn = req.dn.toString();
   if (!db[dn])
     return next(new ldap.NoSuchObjectError(dn));
@@ -61,7 +25,7 @@ server.bind(basedn, function(req, res, next) {
   return next();
 });
 
-server.search(basedn, function(req, res, next) {
+server.search(baseDN, function(req, res, next) {
   var dn = req.dn.toString();
   if (!db[dn])
     return next(new ldap.NoSuchObjectError(dn));
@@ -117,7 +81,6 @@ server.search(basedn, function(req, res, next) {
 
 
 ///--- Fire it up
-
 server.listen(port, function() {
   console.log("Using the following db:")
   console.log(JSON.stringify(db, null, 2));
